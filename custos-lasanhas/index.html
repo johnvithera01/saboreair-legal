@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Controle de Custos das Lasanhas</title>
+<style>
+:root{--bg:#f7f7f5;--card:#fff;--text:#1c1c1a;--muted:#6b6b66;--line:#e5e5df;--g:#1f7a4d;--g2:#eaf6ef;--a:#9a6410;--a2:#fff6df}
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--text);line-height:1.45}
+header{background:#20221f;color:#fff;padding:26px 18px}header .w,main{max-width:1180px;margin:auto}h1{font-size:clamp(26px,5vw,42px);margin:0 0 6px}header p{margin:0;color:#d9ddd7}
+main{padding:22px 14px 60px}.grid{display:grid;gap:14px}.cards{grid-template-columns:repeat(auto-fit,minmax(210px,1fr));margin-bottom:18px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}.card h3{margin:0 0 8px}.big{font-size:28px;font-weight:800}.muted{color:var(--muted)}.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:var(--g2);color:var(--g);font-size:12px;font-weight:700}.warn{background:var(--a2);color:var(--a)}
+section{margin-top:22px}section>h2{font-size:22px;margin:0 0 10px}.tw{overflow-x:auto;background:#fff;border:1px solid var(--line);border-radius:14px}table{width:100%;border-collapse:collapse;min-width:760px}th,td{padding:11px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}th:first-child,td:first-child{text-align:left}th{font-size:12px;text-transform:uppercase;color:var(--muted);background:#fafaf8}tr:last-child td{border-bottom:0}
+input,select{font:inherit;padding:8px 9px;border:1px solid #cccfc8;border-radius:8px;background:#fff;min-width:90px}.small{font-size:13px}.rule{padding:13px 14px;border-left:4px solid var(--g);background:var(--g2);border-radius:8px;margin:8px 0}.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}.result{margin-top:12px;padding:14px;border-radius:10px;background:#f3f4f1}.kpi{font-size:24px;font-weight:800}details{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0}summary{font-weight:700;cursor:pointer}.target{font-weight:700;color:var(--g)}footer{margin-top:30px;color:var(--muted);font-size:12px}@media(max-width:600px){main{padding:14px 10px 50px}.card{padding:13px}th,td{padding:9px 10px}}
+</style></head><body>
+<header><div class="w"><h1>Controle de Custos das Lasanhas</h1><p>Custos, preços, margens, reposição de estoque, apps e regras operacionais.</p></div></header>
+<main>
+<div class="grid cards">
+<div class="card"><div class="muted">Venda direta — P</div><div class="big">R$ 24,90</div><span class="badge">~350 g</span></div>
+<div class="card"><div class="muted">Venda direta — M</div><div class="big">R$ 39,90</div><span class="badge">~550–600 g</span></div>
+<div class="card"><div class="muted">Venda direta — G</div><div class="big">R$ 54,90</div><span class="badge">máx. 850 g</span></div>
+<div class="card"><div class="muted">Reserva venda direta</div><div class="big">15%</div><span class="badge">5% operação + 10% igreja</span></div>
+</div>
+
+<section><h2>1. Custos e margens por sabor</h2><p class="muted">Preços iguais por tamanho. A sobra final desconta custo e 15% da venda.</p><div class="tw"><table id="mt"><thead><tr><th>Produto</th><th>Custo</th><th>Venda</th><th>Lucro bruto</th><th>Margem bruta</th><th>Reserva 15%</th><th>Sobra final</th><th>Margem final</th></tr></thead><tbody></tbody></table></div></section>
+
+<section><h2>2. Regra do dinheiro que entra</h2>
+<div class="rule"><strong>1.</strong> O custo da lasanha volta primeiro para o <strong>cofrinho do estoque</strong>. Não é lucro.</div>
+<div class="rule"><strong>2. Venda direta:</strong> separar 5% operacional + 10% igreja, sobre o valor total da venda.</div>
+<div class="rule"><strong>3. Apps:</strong> estratégia atual: taxa do app + custo + 10% igreja; não separar os 5% operacionais nesse canal.</div>
+<div class="rule"><strong>4. Capital de giro:</strong> se o app paga depois, a reposição ainda precisa acontecer antes. Manter caixa para financiar esse intervalo.</div>
+</section>
+
+<section><h2>3. Calculadora rápida</h2><div class="card"><div class="fg">
+<label>Preço vendido<br><input id="sp" type="number" step="0.01" value="39.90"></label>
+<label>Custo<br><input id="pc" type="number" step="0.01" value="18.09"></label>
+<label>Canal<br><select id="ch"><option value="d">Venda direta</option><option value="i">iFood (26,2%)</option><option value="n">99 (38,56% observado)</option></select></label>
+<label>Operacional %<br><input id="op" type="number" step="0.1" value="5"></label>
+<label>Igreja %<br><input id="ig" type="number" step="0.1" value="10"></label>
+</div><div class="result" id="res"></div></div></section>
+
+<section><h2>4. Custos atuais</h2><div class="tw"><table><thead><tr><th>Sabor</th><th>P</th><th>M</th><th>G até 850 g</th></tr></thead><tbody>
+<tr><td>Bolonhesa</td><td>R$ 10,71</td><td>R$ 18,09</td><td>R$ 25,86</td></tr>
+<tr><td>Frango cremoso</td><td>R$ 9,64</td><td>R$ 15,56</td><td>R$ 23,36</td></tr>
+<tr><td>Presunto e queijo</td><td>~R$ 11,00</td><td>~R$ 20,00</td><td>A validar</td></tr>
+</tbody></table></div></section>
+
+<section><h2>5. Padrão de montagem</h2><div class="grid cards">
+<div class="card"><h3>Bolonhesa e frango</h3><p>3 camadas de molho branco · 2 de recheio · 2 de massa.</p><p><b>P:</b> 2 queijo + 1 presunto<br><b>M:</b> 4 queijo + 2 presunto<br><b>G:</b> 6 queijo + 3 presunto</p></div>
+<div class="card"><h3>Presunto e queijo</h3><p>4 camadas de molho branco.</p><p><b>P:</b> 4 queijo + 3 presunto<br><b>M:</b> 8 queijo + 6 presunto</p><p class="small muted">P: 35 g de molho por camada. M: 60 g por camada.</p></div>
+<div class="card"><h3>Pesos-alvo</h3><p><b>P:</b> ~350 g<br><b>M:</b> ~550–600 g<br><b>G:</b> 800–850 g; nunca acima de 850 g.</p></div>
+<div class="card"><h3>Carne por lasanha</h3><p><b>P:</b> 120 g<br><b>M:</b> 200 g<br><b>G:</b> 280–285 g</p><p class="small"><span class="badge warn">Teste de economia</span> P 110 g · M 180 g · G 250–255 g.</p></div>
+</div></section>
+
+<section><h2>6. Receitas e custos</h2>
+<details open><summary>Bolonhesa</summary><div class="tw"><table><thead><tr><th>Ingrediente</th><th>Uso</th><th>Custo</th></tr></thead><tbody>
+<tr><td>Carne moída</td><td>2 kg</td><td>R$ 70,06</td></tr><tr><td>Molho tomate</td><td>779 g</td><td>R$ 7,33</td></tr><tr><td>Cebolinha</td><td>10 ramos</td><td>~R$ 2,43</td></tr><tr><td>Pimenta cheiro</td><td>60 g</td><td>~R$ 1,79</td></tr><tr><td>Dedo-de-moça</td><td>2 un.</td><td>~R$ 1,43</td></tr><tr><td>Cebola</td><td>1 un.</td><td>~R$ 1,03</td></tr><tr><td><b>Subtotal</b></td><td></td><td><b>~R$ 84,07</b></td></tr>
+</tbody></table></div></details>
+<details><summary>Frango cremoso</summary><div class="tw"><table><thead><tr><th>Ingrediente</th><th>Uso</th><th>Custo</th></tr></thead><tbody>
+<tr><td>Frango</td><td>1 kg</td><td>R$ 18,79</td></tr><tr><td>Molho tomate</td><td>200 g</td><td>R$ 1,88</td></tr><tr><td>Requeijão</td><td>160 g</td><td>R$ 6,32</td></tr><tr><td>Cebola</td><td>1 un.</td><td>~R$ 1,03</td></tr><tr><td>Cebolinha</td><td>6 ramos</td><td>~R$ 1,46</td></tr><tr><td><b>Subtotal</b></td><td></td><td><b>~R$ 29,48</b></td></tr>
+</tbody></table></div></details>
+<details><summary>Molho branco</summary><div class="tw"><table><thead><tr><th>Ingrediente</th><th>Uso</th><th>Custo</th></tr></thead><tbody>
+<tr><td>Leite</td><td>2,5 L</td><td>R$ 11,25</td></tr><tr><td>Farinha</td><td>200 g</td><td>R$ 0,98</td></tr><tr><td>Margarina</td><td>248 g</td><td>R$ 3,97</td></tr><tr><td>Requeijão</td><td>450 g</td><td>R$ 17,76</td></tr><tr><td><b>Total</b></td><td></td><td><b>R$ 33,96</b></td></tr>
+</tbody></table></div><p class="small">Sobrou ~600 g na primeira leva; depois ~520 g foram usados em 2 P + 1 M de presunto/queijo e restaram ~86 g para o molho de quatro queijos/gorgonzola.</p></details>
+<details><summary>Presunto e queijo — produção 2 P + 1 M</summary><div class="tw"><table><thead><tr><th>Componente</th><th>Custo consumido</th></tr></thead><tbody>
+<tr><td>Molho branco (~520 g)</td><td>~R$ 5,89</td></tr><tr><td>Presunto (~246 g)</td><td>~R$ 8,86</td></tr><tr><td>Queijo (~321 g)</td><td>~R$ 17,33</td></tr><tr><td>Massa restante (~237 g)</td><td>~R$ 4,12</td></tr><tr><td>Marmitas</td><td>~R$ 4,36</td></tr><tr><td>Sacos delivery</td><td>~R$ 1,37</td></tr><tr><td><b>Total</b></td><td><b>~R$ 41,92</b></td></tr>
+</tbody></table></div></details>
+</section>
+
+<section><h2>7. Insumos comprados</h2><div class="tw"><table><thead><tr><th>Item</th><th>Quantidade</th><th>Preço</th><th>Custo unitário</th></tr></thead><tbody>
+<tr><td>Carne moída</td><td>2 kg</td><td>R$ 70,06</td><td>R$ 35,03/kg</td></tr>
+<tr><td>Frango</td><td>1 kg</td><td>R$ 18,79</td><td>R$ 18,79/kg</td></tr>
+<tr><td>Queijo Piracanjuba</td><td>500 g</td><td>R$ 26,99</td><td>R$ 53,98/kg</td></tr>
+<tr><td>Queijo adicional</td><td>~450 g</td><td>R$ 24,00</td><td>~R$ 53,33/kg</td></tr>
+<tr><td>Presunto inicial</td><td>180 g</td><td>R$ 6,09</td><td>R$ 33,83/kg</td></tr>
+<tr><td>Presunto recente</td><td>280 g</td><td>R$ 10,08</td><td>R$ 36,00/kg</td></tr>
+<tr><td>Requeijão</td><td>400 g</td><td>R$ 15,79</td><td>R$ 39,48/kg</td></tr>
+<tr><td>Massa fresca</td><td>500 g</td><td>R$ 8,69</td><td>R$ 17,38/kg</td></tr>
+<tr><td>Molho/extrato tomate</td><td>1,7 kg</td><td>R$ 16,00</td><td>R$ 9,41/kg</td></tr>
+<tr><td>Leite</td><td>1 L</td><td>R$ 4,50</td><td>R$ 4,50/L</td></tr>
+<tr><td>Farinha</td><td>1 kg</td><td>R$ 4,89</td><td>R$ 4,89/kg</td></tr>
+<tr><td>Margarina</td><td>500 g</td><td>R$ 8,00</td><td>R$ 16,00/kg</td></tr>
+<tr><td>Cebola</td><td>1,120 kg</td><td>R$ 7,67</td><td>R$ 6,85/kg</td></tr>
+<tr><td>Pimenta de cheiro</td><td>100 g</td><td>R$ 2,99</td><td>R$ 29,90/kg</td></tr>
+<tr><td>Dedo-de-moça</td><td>70 g</td><td>R$ 4,99</td><td>R$ 71,29/kg</td></tr>
+<tr><td>Cebolinha</td><td>~15 ramos</td><td>R$ 3,65</td><td>pacote</td></tr>
+<tr><td>Marmita P</td><td>10</td><td>R$ 13,39</td><td>R$ 1,34/un.</td></tr>
+<tr><td>Marmita M</td><td>10</td><td>R$ 16,79</td><td>R$ 1,68/un.</td></tr>
+<tr><td>Marmita G</td><td>10</td><td>R$ 21,49</td><td>R$ 2,15/un.</td></tr>
+<tr><td>Saco M</td><td>50</td><td>R$ 22,89</td><td>R$ 0,46/un.</td></tr>
+<tr><td>Saco GG</td><td>50</td><td>R$ 36,49</td><td>R$ 0,73/un.</td></tr>
+<tr><td>Ketchup</td><td>168</td><td>R$ 27,99</td><td>~R$ 0,17/un.</td></tr>
+<tr><td>Maionese</td><td>168</td><td>R$ 27,99</td><td>~R$ 0,17/un.</td></tr>
+<tr><td>Parmesão ralado</td><td>50 g</td><td>R$ 6,35</td><td>R$ 0,127/g</td></tr>
+<tr><td>Parmesão peça</td><td>~500–600 g</td><td>~R$ 37,00</td><td>peso pendente</td></tr>
+<tr><td>Temperos</td><td>estimativa</td><td>R$ 5,00</td><td>por produção</td></tr>
+</tbody></table></div></section>
+
+<section><h2>8. Metas para baixar custo</h2><div class="tw"><table><thead><tr><th>Insumo</th><th>Atual</th><th>Meta</th><th>Ação</th></tr></thead><tbody>
+<tr><td>Carne</td><td>R$ 35,03/kg</td><td class="target">≤ R$ 30/kg</td><td>Promoção/atacado + teste de -10% gramagem</td></tr>
+<tr><td>Frango</td><td>R$ 18,79/kg</td><td class="target">≤ R$ 16/kg</td><td>Volume/promoção</td></tr>
+<tr><td>Queijo</td><td>~R$ 53,67/kg</td><td class="target">≤ R$ 45/kg</td><td>Peça maior/atacado</td></tr>
+<tr><td>Presunto</td><td>R$ 33,83–36/kg</td><td class="target">≤ R$ 30/kg</td><td>Peça/pacote maior</td></tr>
+<tr><td>Requeijão</td><td>R$ 39,48/kg</td><td class="target">≤ R$ 30/kg</td><td>Balde/pote grande; testar 350 g no molho branco</td></tr>
+<tr><td>Massa</td><td>R$ 17,38/kg</td><td class="target">≤ R$ 14–15/kg</td><td>Fornecedor/atacado</td></tr>
+<tr><td>Margarina</td><td>R$ 16/kg</td><td class="target">≤ R$ 13/kg</td><td>Embalagem maior</td></tr>
+<tr><td>Embalagens</td><td>R$ 1,34–2,15/un.</td><td class="target">-15% a -20%</td><td>Pacotes de 100+</td></tr>
+</tbody></table></div><p><b>Meta geral:</b> reduzir 15%–20% do custo sem piorar a qualidade.</p></section>
+
+<section><h2>9. Apps, refrigerantes e combos</h2><div class="grid cards">
+<div class="card"><h3>Taxas observadas</h3><p><b>iFood:</b> 26,2% (R$ 8,88 sobre R$ 33,90).</p><p><b>99:</b> 38,56% observado (R$ 65,80 vendidos; R$ 40,43 recebidos).</p><p class="small muted">Validar a 99 em mais pedidos.</p></div>
+<div class="card"><h3>Custo das latas</h3><p>Guaraná <b>R$ 1,99</b><br>Fanta <b>R$ 3,65</b><br>Coca <b>R$ 4,14</b></p></div>
+<div class="card"><h3>Combos referência</h3><p><b>Direto:</b> P+lata R$ 30,90 · M+lata R$ 42,90</p><p><b>iFood:</b> P+lata R$ 38,90 · M+lata R$ 50,90</p></div>
+</div></section>
+
+<section><h2>10. Regras de controle</h2><ul>
+<li>Separar o custo da unidade no momento da venda.</li>
+<li>Reposição de estoque nunca é lucro.</li>
+<li>Pesar queijo e frios por lote para refinar custo.</li>
+<li>G deve respeitar 850 g.</li>
+<li>Sobra reaproveitável continua como estoque.</li>
+<li>Atualizar preço/kg sempre que comprar novamente.</li>
+</ul></section>
+<footer>Controle interno • atualizado em 23/09/2026 • valores aproximados devem ser revisados com novas compras e pesagens.</footer>
+</main>
+<script>
+var products=[["Bolonhesa P",10.71,24.90],["Bolonhesa M",18.09,39.90],["Bolonhesa G",25.86,54.90],["Frango P",9.64,24.90],["Frango M",15.56,39.90],["Frango G",23.36,54.90],["Presunto e queijo P",11,24.90],["Presunto e queijo M",20,39.90]];
+function brl(v){return v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"})} function pct(v){return (v*100).toFixed(1).replace(".",",")+"%"}
+var tb=document.querySelector("#mt tbody");products.forEach(function(p){var g=p[2]-p[1],r=p[2]*.15,n=p[2]-p[1]-r,tr=document.createElement("tr");tr.innerHTML="<td>"+p[0]+"</td><td>"+brl(p[1])+"</td><td>"+brl(p[2])+"</td><td>"+brl(g)+"</td><td>"+pct(g/p[2])+"</td><td>"+brl(r)+"</td><td><b>"+brl(n)+"</b></td><td><b>"+pct(n/p[2])+"</b></td>";tb.appendChild(tr)});
+var sp=document.querySelector("#sp"),pc=document.querySelector("#pc"),ch=document.querySelector("#ch"),op=document.querySelector("#op"),ig=document.querySelector("#ig"),res=document.querySelector("#res");
+function calc(){var s=Math.max(0,Number(sp.value)||0),c=Math.max(0,Number(pc.value)||0),rate=ch.value==="i"?.262:ch.value==="n"?.3856:0;if(ch.value!=="d")op.value="0";var o=(Number(op.value)||0)/100,i=(Number(ig.value)||0)/100,fee=s*rate,rv=s*(o+i),net=s-fee-c-rv;res.innerHTML="<div class='grid cards'><div><div class='muted small'>Taxa do canal</div><div class='kpi'>"+brl(fee)+"</div></div><div><div class='muted small'>Reposição</div><div class='kpi'>"+brl(c)+"</div></div><div><div class='muted small'>Reservas</div><div class='kpi'>"+brl(rv)+"</div></div><div><div class='muted small'>Sobra livre</div><div class='kpi'>"+brl(net)+"</div><div class='small'>"+(s?((net/s)*100).toFixed(1).replace(".",",")+"%":"0%")+" da venda</div></div></div>"}
+[sp,pc,ch,op,ig].forEach(function(e){e.addEventListener("input",calc)});calc();
+</script></body></html>
